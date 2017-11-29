@@ -80,8 +80,6 @@ configure Inviso on the NameNode/ResourceManager host.
   > source venv/bin/activate
   > pip install -r inviso/jes/requirements.txt
   > cd inviso/jes/
-  #Edit inviso.conf and adapt it to your needs.
-  > vim inviso/jes/conf/inviso.conf
   > python jes.py
   > python index_cluster_stats.py
 
