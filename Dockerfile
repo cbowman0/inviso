@@ -60,11 +60,11 @@ RUN echo '[program:elasticsearch]' >> ${SERVICE_CONF} ; \
 	echo '' >> ${SERVICE_CONF}
 
 # install jes
-RUN pip install -r inviso/jes/requirements.txt ; \
-	cp inviso/jes/settings_default.py inviso/jes/settings.py
+# RUN pip install -r inviso/jes/requirements.txt ; \
+# 	cp inviso/jes/settings_default.py inviso/jes/settings.py
 
-RUN ["/bin/bash", "-c", "while true; do sleep 300s; python inviso/jes/jes.py; done&"]
-RUN ["/bin/bash", "-c", "while true; do sleep 300s; python inviso/jes/index_cluster_stats.py; done&"]
+# RUN ["/bin/bash", "-c", "while true; do sleep 300s; python inviso/jes/jes.py; done&"]
+# RUN ["/bin/bash", "-c", "while true; do sleep 300s; python inviso/jes/index_cluster_stats.py; done&"]
 
 # additional scripting for the boot sequence
 EXPOSE 8080
