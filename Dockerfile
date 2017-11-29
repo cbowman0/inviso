@@ -5,8 +5,7 @@ MAINTAINER Jash Lee <s905060@gmail.com>
 # install required dependencies
 #
 RUN apt-get update && apt-get install -y wget curl git python-pip supervisor
-RUN gradle -v ; \
-	pip install --upgrade pip ; \
+RUN pip install --upgrade pip ; \
 	pip install virtualenv
 
 # installation will take place in /opt
