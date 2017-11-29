@@ -1,4 +1,3 @@
-# FROM dockerfile/java:oracle-java7
 FROM inetsoftware/ubuntu-java-gradle
 MAINTAINER Jash Lee <s905060@gmail.com>
 
@@ -34,7 +33,7 @@ RUN wget -qq http://download.elasticsearch.org/elasticsearch/elasticsearch/elast
 
 # INVISO_COMMIT_HASH allows us to specify the exact version of inviso this container will build
 #
-ENV INVISO_COMMIT_HASH 983fd367c9b3ad95ed13d0edc1d0b0b5600314a5
+ENV INVISO_COMMIT_HASH a41db0f248ba7470b01a704781bc38d1b1da02d6
 
 # clone the inviso repo and build the project
 #
