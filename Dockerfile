@@ -67,7 +67,7 @@ RUN echo '[program:elasticsearch]' >> ${SERVICE_CONF} ; \
 # RUN ["/bin/bash", "-c", "while true; do sleep 300s; python inviso/jes/index_cluster_stats.py; done&"]
 
 # additional scripting for the boot sequence
-EXPOSE 8080
+EXPOSE 8080 9200
 
 CMD [ "/usr/bin/supervisord", "--nodaemon" ]
 
