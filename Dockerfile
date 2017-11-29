@@ -33,7 +33,7 @@ RUN wget -qq http://download.elasticsearch.org/elasticsearch/elasticsearch/elast
 
 # INVISO_COMMIT_HASH allows us to specify the exact version of inviso this container will build
 #
-ENV INVISO_COMMIT_HASH a41db0f248ba7470b01a704781bc38d1b1da02d6
+ENV INVISO_COMMIT_HASH 30b445c4221ecdcf432f4009e176f80a7c922dbd
 
 # clone the inviso repo and build the project
 #
