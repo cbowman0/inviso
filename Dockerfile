@@ -44,9 +44,10 @@ RUN cp "${TARGET}/inviso/trace-mr2/build/libs/inviso#mr2#v0.war" ${TARGET}/apach
 
 # install jes
 RUN pip install -r inviso/jes/requirements.txt ; \
-	cp inviso/jes/settings_default.py inviso/jes/settings.py ; \
-	while true; do sleep 60s; python jes.py; done& ; \
-	while true; do sleep 60s; python index_cluster_stats.py; done& ;
+	cp inviso/jes/settings_default.py inviso/jes/settings.py
+
+RUN ["/bin/bash", "-c", "while true; do sleep 60s; python jes.py; done&"]
+RUN ["/bin/bash", "-c", "while true; do sleep 60s; python index_cluster_stats.py; done&"]
 
 # configure elasticsearch to point to inviso
 #
