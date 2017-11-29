@@ -1,10 +1,12 @@
-FROM dockerfile/java:oracle-java7
-MAINTAINER Matt Ho <matt.ho@gmail.com>
+# FROM dockerfile/java:oracle-java7
+FROM inetsoftware/ubuntu-java-gradle
+MAINTAINER Jash Lee <s905060@gmail.com>
 
 # install required dependencies
 #
 RUN apt-get update && apt-get install -y wget curl git python-pip supervisor
-RUN pip install gradle ; \
+RUN gradle -v ; \
+	pip install --upgrade pip ; \
 	pip install virtualenv
 
 # installation will take place in /opt
@@ -17,8 +19,8 @@ WORKDIR /opt
 
 # install tomcat
 #
-ENV TOMCAT_VERSION 7.0.56
-RUN wget -qq http://mirror.nexcess.net/apache/tomcat/tomcat-7/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz ; \
+ENV TOMCAT_VERSION 7.0.82
+RUN wget -qq http://mirror.jax.hugeserver.com/apache/tomcat/tomcat-7/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz ; \
 	tar -xzvf apache-tomcat-${TOMCAT_VERSION}.tar.gz ; \
 	rm -r apache-tomcat-${TOMCAT_VERSION}/webapps/* ; \
 	rm apache-tomcat-${TOMCAT_VERSION}.tar.gz ; \

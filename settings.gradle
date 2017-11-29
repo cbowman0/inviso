@@ -18,4 +18,4 @@
 
 rootProject.name = 'inviso'
 
-include 'trace-mr1', 'trace-mr2'
+include 'trace-mr2'
