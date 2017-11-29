@@ -11,7 +11,6 @@ from inviso.publish import DirectPublisher
 from snakebite import channel
 from snakebite.channel import log_protobuf_message
 from snakebite.protobuf.IpcConnectionContext_pb2 import IpcConnectionContextProto
-from inviso.conf_reader import getConfElement
 
 log = util.get_logger("inviso-settings")
 
@@ -19,7 +18,7 @@ log = util.get_logger("inviso-settings")
 def create_hadoop_connection_context(self):
     '''Creates and seriazlies a IpcConnectionContextProto (not delimited)'''
     context = IpcConnectionContextProto()
-    context.userInfo.effectiveUser = getConfElement('cluster','effective_user')
+    context.userInfo.effectiveUser = 'hdfs'
     context.protocol = "org.apache.hadoop.hdfs.protocol.ClientProtocol"
 
     s_context = context.SerializeToString()
@@ -61,12 +60,21 @@ def inviso_trace(job_id, uri, version='mr1', summary=True):
     
     return response.json()
 
-inviso_host = getConfElement('inviso','inviso_host')
-genie_host = getConfElement('inviso','genie_host')
-elasticsearch_hosts = [{'host': getConfElement('elastic_search','host'), 'port': int(getConfElement('elastic_search','port'))}]
+inviso_host = 'localhost:8080'
+genie_host = 'localhost:8080'
+elasticsearch_hosts = [{'host': 'localhost', 'port': 9200}]
 elasticsearch = Elasticsearch(elasticsearch_hosts)
 clusters = [
-    Cluster(id=getConfElement('cluster','cluster_id'), name=getConfElement('cluster','cluster_name'), host=socket.getfqdn(getConfElement('cluster','resource_manager')), port=getConfElement('cluster','resource_manager_port'),namenode=getConfElement('cluster','namenode'),namenode_port=int(getConfElement('cluster','namenode_port')),history_server=getConfElement('cluster','history_server_dir'))
+    Cluster(
+        id = 'Hadoopi',
+        name = 'Hadoopi',
+        host = socket.getfqdn(),
+        namenode_host = '10.22.64.4',
+        namenode_rpc_port = 8020,
+        resourcemanager_host = '10.22.64.21',
+        resourcemanager_webapp_port = 8088,
+        log_path = '/user/history/done'
+    )
 ]
 
 handler = IndexHandler(trace=inviso_trace, elasticsearch=elasticsearch)

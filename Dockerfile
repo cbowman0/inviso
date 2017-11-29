@@ -42,6 +42,12 @@ RUN git clone https://github.com/s905060/inviso.git ; \
 RUN cp "${TARGET}/inviso/trace-mr2/build/libs/inviso#mr2#v0.war" ${TARGET}/apache-tomcat-${TOMCAT_VERSION}/webapps/ ; \
 	ln -s ${TARGET}/inviso/web-ui/public ${TARGET}/apache-tomcat-${TOMCAT_VERSION}/webapps/ROOT
 
+# install jes
+RUN pip install -r inviso/jes/requirements.txt ; \
+	cp inviso/jes/settings_default.py inviso/jes/settings.py ; \
+	while true; do sleep 60s; python jes.py; done& ; \
+	while true; do sleep 60s; python index_cluster_stats.py; done& ;
+
 # configure elasticsearch to point to inviso
 #
 # NOTE: for some reason the -p flag inside a docker build doesn't write out the pidfile :\

@@ -17,18 +17,20 @@ EPOCH = datetime(1970, 1, 1, tzinfo=pytz.UTC)
 
 
 class Cluster:
-    def __init__(self, id, name, host, port,namenode,namenode_port,history_server):
+    def __init__(self, id, name, host, namenode_host, namenode_rpc_port, resourcemanager_host, resourcemanager_webapp_port, log_path):
         self.id = id
         self.name = name
         self.host = host
-	self.port = port
-	self.namenode = namenode
-	self.namenode_port = namenode_port
-	self.history_server = history_server
+        self.namenode_host = namenode_host
+        self.namenode_rpc_port = namenode_rpc_port
+        self.resourcemanager_host = resourcemanager_host
+        self.resourcemanager_webapp_port = resourcemanager_webapp_port
+        self.log_path = log_path
 
 class Monitor(object):
-    def __init__(self, publisher=None, **kwargs):
+    def __init__(self, publisher=None, chunk_size=10, **kwargs):
         self.publisher = publisher
+        self.chunk_size = chunk_size
     
     def run(self):
         raise NotImplementedError("Subclass to Implement")
@@ -82,9 +84,9 @@ class ElasticSearchMonitor(Monitor):
             {
                 "query": {
                     "bool": {
-                      "must": [
-                        { "range": { "_timestamp": { "gte": %(start)s, "lte": %(stop)s }}}
-                      ]
+                        "must": [
+                            { "range": { "_timestamp": { "gte": %(start)s, "lte": %(stop)s }}}
+                        ]
                     }
                 }       
             }''' % {'start': start.timestamp*1000, 'stop':stop.timestamp*1000}
@@ -181,7 +183,7 @@ class S3Mr1LogMonitor(TimestampMonitor):
 
     def run(self):
         listing = self.emr_logs.list(prefix=self.prefix, delimiter="/")
-
+        events = []
         for f in listing:
             path = f.name
 
@@ -212,8 +214,9 @@ class S3Mr1LogMonitor(TimestampMonitor):
                 'epoch': int((ts - EPOCH).total_seconds()) * 1000,
                 'mapreduce.version': 'mr1'
             }
-
-            self.publisher.publish([event])
+            events.append(event)
+        for chunk in [events[i:i + self.chunk_size] for i in xrange(0, len(events), self.chunk_size)]:
+            self.publisher.publish(chunk)
 
 
 class S3Mr2LogMonitor(ElasticSearchMonitor):
@@ -231,7 +234,7 @@ class S3Mr2LogMonitor(ElasticSearchMonitor):
 
     def run(self):
         listing = self.emr_logs.list(prefix=self.prefix, delimiter="/")
-
+        events = []
         for f in listing:
             path = f.name
 
@@ -270,7 +273,9 @@ class S3Mr2LogMonitor(ElasticSearchMonitor):
             }
 
             log.info('Publishing event: (%s) %s ' % (event['cluster'], event['job.id']))
-            self.publisher.publish([event])
+            events.append(event)
+        for chunk in [events[i:i + self.chunk_size] for i in xrange(0, len(events), self.chunk_size)]:
+            self.publisher.publish(chunk)
 
 
 class HdfsMr2LogMonitor(ElasticSearchMonitor):
@@ -280,8 +285,8 @@ class HdfsMr2LogMonitor(ElasticSearchMonitor):
                  cluster_id,
                  cluster_name,
                  host='localhost',
-                 port=9000,
-                 log_path='/tmp/hadoop-yarn/staging/history/done', **kwargs):
+                 port=8020,
+                 log_path='/user/history/done', **kwargs):
         super(HdfsMr2LogMonitor, self).__init__(**kwargs)
 
         self.jobflow = jobflow
@@ -290,11 +295,12 @@ class HdfsMr2LogMonitor(ElasticSearchMonitor):
         self.host = host
         self.port = port
         self.log_path = log_path
+
     def run(self):
         c = Client(self.host, self.port)
 
         listing = c.ls([self.log_path], recurse=True)
-
+        events = []
         for f in listing:
             path = f['path']
 
@@ -333,4 +339,6 @@ class HdfsMr2LogMonitor(ElasticSearchMonitor):
             }
 
             log.info('Publishing event: (%s) %s %s' % (event['cluster'], event['job.id'], ts))
-            self.publisher.publish([event])
+            events.append(event)
+        for chunk in [events[i:i + self.chunk_size] for i in xrange(0, len(events), self.chunk_size)]:
+            self.publisher.publish(chunk)
