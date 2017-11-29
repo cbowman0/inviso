@@ -34,11 +34,11 @@ RUN wget -qq http://download.elasticsearch.org/elasticsearch/elasticsearch/elast
 
 # INVISO_COMMIT_HASH allows us to specify the exact version of inviso this container will build
 #
-ENV INVISO_COMMIT_HASH a29450ace4a9f467d34f29b6f69094b69edbff1b
+ENV INVISO_COMMIT_HASH 983fd367c9b3ad95ed13d0edc1d0b0b5600314a5
 
 # clone the inviso repo and build the project
 #
-RUN git clone https://github.com/Netflix/inviso.git ; \
+RUN git clone https://github.com/s905060/inviso.git ; \
 	(cd inviso; git reset --hard ${INVISO_COMMIT_HASH} ; ./gradlew assemble) 
 RUN cp "${TARGET}/inviso/trace-mr2/build/libs/inviso#mr2#v0.war" ${TARGET}/apache-tomcat-${TOMCAT_VERSION}/webapps/ ; \
 	ln -s ${TARGET}/inviso/web-ui/public ${TARGET}/apache-tomcat-${TOMCAT_VERSION}/webapps/ROOT
