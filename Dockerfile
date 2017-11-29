@@ -17,8 +17,8 @@ WORKDIR /opt
 
 # install tomcat
 #
-ENV TOMCAT_VERSION 7.0.82
-RUN wget -qq http://mirror.jax.hugeserver.com/apache/tomcat/tomcat-7/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz ; \
+ENV TOMCAT_VERSION 7.0.55
+RUN wget -qq https://archive.apache.org/dist/tomcat/tomcat-7/v${TOMCAT_VERSION}/bin/apache-tomcat-${TOMCAT_VERSION}.tar.gz ; \
 	tar -xzvf apache-tomcat-${TOMCAT_VERSION}.tar.gz ; \
 	rm -r apache-tomcat-${TOMCAT_VERSION}/webapps/* ; \
 	rm apache-tomcat-${TOMCAT_VERSION}.tar.gz ; \
@@ -46,9 +46,6 @@ RUN cp "${TARGET}/inviso/trace-mr2/build/libs/inviso#mr2#v0.war" ${TARGET}/apach
 RUN pip install -r inviso/jes/requirements.txt ; \
 	cp inviso/jes/settings_default.py inviso/jes/settings.py
 
-RUN ["/bin/bash", "-c", "while true; do sleep 60s; python jes.py; done&"]
-RUN ["/bin/bash", "-c", "while true; do sleep 60s; python index_cluster_stats.py; done&"]
-
 # configure elasticsearch to point to inviso
 #
 # NOTE: for some reason the -p flag inside a docker build doesn't write out the pidfile :\
@@ -65,6 +62,9 @@ RUN echo '[program:elasticsearch]' >> ${SERVICE_CONF} ; \
 	echo '[program:tomcat]' >> ${SERVICE_CONF} ; \
 	echo "command=${TARGET}/apache-tomcat-${TOMCAT_VERSION}/bin/catalina.sh run" >> ${SERVICE_CONF} ; \
 	echo '' >> ${SERVICE_CONF}
+
+RUN ["/bin/bash", "-c", "while true; do sleep 300s; python inviso/jes/jes.py; done&"]
+RUN ["/bin/bash", "-c", "while true; do sleep 300s; python inviso/jes/index_cluster_stats.py; done&"]
 
 # additional scripting for the boot sequence
 EXPOSE 8080
