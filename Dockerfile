@@ -3,7 +3,7 @@ MAINTAINER Jash Lee <s905060@gmail.com>
 
 # install required dependencies
 #
-RUN apt-get update && apt-get install -y wget curl git python-pip supervisor
+RUN apt-get update && apt-get install -y wget curl vim git python-pip supervisor
 RUN pip install --upgrade pip ; \
 	pip install virtualenv
 
